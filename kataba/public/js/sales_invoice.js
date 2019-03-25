@@ -6,14 +6,17 @@ frappe.ui.form.on("Sales Invoice", {
 
 		disableVirtualAccountField(100);
     },
+
     sales_partner: function(frm) {
         isCommissionsValid = setCommissionValues(frm);     
     },
+
     items: function(frm) {
         if (frm.doc.sales_partner !== "") {
             isCommissionsValid = setCommissionValues(frm);
         }
     },
+
     on_submit: function(frm) {
         if (frm.doc.mgs_total_commission > 0) {
             frappe.call({ // Get Company info
@@ -44,6 +47,7 @@ frappe.ui.form.on("Sales Invoice", {
             })
         }
     },
+
     validate: function (frm) {
 		if (!isCommissionsValid) {
 			frappe.validated = false;
