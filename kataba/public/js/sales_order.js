@@ -113,7 +113,7 @@ function so_generateVirtualAccountNo(frm) {
 					typeFound = true;
 				}else if (pp.document_type === "Item Group") {
 					for (var j = 0; j < frm.doc.items.length; j++) {
-						if (pp.document_type_id === frm.doc.items[j].item_group && !typeFound){
+						if (pp.document_type_id === getParentItemGroup(frm.doc.items[j].item_group) && !typeFound){
 							newVA += pp.id;
 							newID += pp.id;
 							typeFound = true;
@@ -172,7 +172,7 @@ function so_generateVirtualAccountNo(frm) {
 						"method": "kataba.client.make_new_VA",
 						args: {
 							"VANO": newVA,
-				"docname": frm.doc.name
+							"docname": frm.doc.name
 						},
 						callback: function (make_new_va_data) {
 							frm.set_value("virtual_account", make_new_va_data.message);

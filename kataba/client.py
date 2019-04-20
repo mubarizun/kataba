@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import frappe
+import frappe, json
 
 @frappe.whitelist()
 def run_sql(sql):
@@ -66,3 +66,64 @@ def delete_VA(VANO, docname):
 	#frappe.db.sql(sql)
 	sql = "update `tabVirtual Account` set status = 'cancelled' where name ='"+VANO+"'"
 	return frappe.db.sql(sql)
+
+@frappe.whitelist()
+def new_journal_entry(doc):
+	from datetime import datetime
+	doc = json.loads(doc)
+
+	def get_je_items():
+		return {
+		"doctype": "Journal Entry",
+		"voucher_type": "Journal Entry",
+		"naming_series": "ACC-JV-.YYYY.-",
+		"company": doc["company"],
+		"posting_date": str(datetime.now())[:str(datetime.now()).index(" ")],
+		"cheque_no": doc["name"],
+		"cheque_date": doc["posting_date"]
+	}
+
+	je_item_1 = get_je_items()
+
+	je_item_1["accounts"] = [
+		{
+			"account": doc["debit_to"],
+			"cost_center": "Main - DTT", # change later
+			"debit_in_account_currency": doc["agent_commission_rate"],
+			"party_type": "Customer", # change later
+			"party": "Customer 1", # change later
+		},
+		{
+			"account": "2141.000 - Hutang Pajak - DTT", # change later
+			"party_type": "Supplier",
+			"party": doc["sales_partner"],
+			"cost_center": "Main - DTT", # change later
+			"credit_in_account_currency": doc["agent_commission_rate"]
+		}
+	]
+
+	je_item_2 = get_je_items()
+
+	je_item_2["accounts"] = [
+		{
+			"account": doc["debit_to"],
+			"cost_center": "Main - DTT", # change later
+			"debit_in_account_currency": doc["territory_commission_rate"],
+			"party_type": "Customer", # change later
+			"party": "Customer 1", # change later
+		},
+		{
+			"account": "2141.000 - Hutang Pajak - DTT", # change later
+			"party_type": "Supplier",
+			"party": doc["sales_partner"], # change later
+			"cost_center": "Main - DTT", # change later
+			"credit_in_account_currency": doc["territory_commission_rate"]
+		}
+	]
+
+	a = frappe.get_doc(je_item_1).insert()
+	b = frappe.get_doc(je_item_2).insert()
+	a.submit()
+	b.submit()
+	return ({"item_1":a.name,"item_2":b.name})
+	
