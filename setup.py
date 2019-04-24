@@ -13,9 +13,9 @@ with open('kataba/__init__.py', 'rb') as f:
 		f.read().decode('utf-8')).group(1)))
 
 setup(
-	name='kataba',
+	name='dtt',
 	version=version,
-	description='kataba scripts',
+	description='dtt scripts',
 	author='Kataba',
 	author_email='info@kataba.id',
 	packages=find_packages(),
